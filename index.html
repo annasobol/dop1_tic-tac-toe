@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Змейка на JS</title>
+    <style>
+        #game {
+            border: 5px solid rgb(21, 235, 56);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="game" width="500" height="500"></canvas>
+</body>
+</html>
+
+<script>
+let canvas = document.getElementById("game"); 
+let ctx = canvas.getContext("2d"); 
+let score = 0; // счёт
+let blockSize = 10; 
+let direction = "right";
+let positionApple = [positionAppleRandom(), positionAppleRandom()]; // Стартовая позиция яблока
+// Массив тела змейки
+let snakeBody = [
+    [3, 2],
+    [4, 2],
+    [5, 2],
+    [6, 2],
+]
+
+function positionAppleRandom() {
+    let rand = Math.random() * 50;
+    return Math.round(rand);
+}
+
+document.addEventListener("keydown", function(e) {
+    
+    if (e.keyCode == "39" && direction !== "left") {
+        direction = "right"; 
+    }
+    
+    if (e.keyCode == "40" && direction !== "top") {
+        direction = "down"; 
+    }
+
+    if (e.keyCode == "37" && direction !== "right") {
+        direction = "left"; 
+    }
+    
+    if (e.keyCode == "38" && direction !== "down") {
+        direction = "top"; 
+    }
+})
+
+play = setInterval(function() {
+    // Всё стираем с игрового поля
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+ 
+    if (direction == "right") {
+        snakeBody.unshift([++snakeBody[0][0], snakeBody[0][1]]);
+    } else if (direction == "down") {
+        snakeBody.unshift([snakeBody[0][0], ++snakeBody[0][1]]);
+    } else if (direction == "left") {
+        snakeBody.unshift([--snakeBody[0][0], snakeBody[0][1]]);
+    } else if (direction == "top") {
+        snakeBody.unshift([snakeBody[0][0], --snakeBody[0][1]]);
+    }
+    snakeBody.pop();
+    // Рисуем змейку
+    for (let i = 0; i < snakeBody.length; ++i) {
+        ctx.fillStyle = "green";
+        ctx.fillRect(snakeBody[i][0] * blockSize, snakeBody[i][1] * blockSize, 10, 10);
+    }
+ 
+    // Рисуем яблоко
+    ctx.fillStyle = "red";
+    ctx.fillRect(positionApple[0] * blockSize, positionApple[1] * blockSize, 10, 10);
+
+    // Если яблоко было съедено
+    if (snakeBody[0][0] == positionApple[0] && snakeBody[0][1] == positionApple[1]) {
+        snakeBody.push(snakeBody[snakeBody.length - 1]);
+        positionApple[0] = positionAppleRandom();
+        positionApple[1] = positionAppleRandom();
+        score++;
+    }
+ 
+   
+    if (snakeBody[0][0] * 10 > 500 || snakeBody[0][1] * 10 > 500 || snakeBody[0][0] * 10 < 0 || snakeBody[0][1] * 10 < 0) {
+        clearInterval(play);
+        alert("Ваша змейка скушала столько: " + score);
+    }
+
+}, 60);
+</script>
